@@ -28,7 +28,7 @@
     "@electron-forge/maker-rpm": "^6.2.1",
     "@electron-forge/maker-squirrel": "^6.2.1",
     "@electron-forge/maker-zip": "^6.2.1",
-    "electron": "25.1.1"
+    "electron": "25.8.4"
   },
   "productName": "startup-electron"
 }
