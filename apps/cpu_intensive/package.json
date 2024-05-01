@@ -1,39 +1,27 @@
 {
-	"author": {
-		"email": "Land@PlayForm.Cloud",
-		"name": "🌆 — Land —",
-		"url": "HTTPS://Land.PlayForm.Cloud"
-	},
-	"bugs": {
-		"url": "HTTPS://GitHub.Com/CodeEditorLand/BenchMarkElectron/issues"
-	},
-	"config": {
-		"forge": {
-			"packagerConfig": {}
-		}
-	},
-	"dependencies": {},
+	"name": "cpu-intensive",
+	"version": "0.0.1",
+	"private": false,
 	"description": "My Electron application description",
-	"devDependencies": {
-		"@playform/build": "0.0.7",
-		"@playform/document": "0.0.6"
-	},
-	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/BenchMarkElectron#readme",
 	"keywords": [
 		"land"
 	],
-	"license": "SEE LICENSE IN LICENSE",
-	"main": "src/index.js",
-	"name": "cpu-intensive",
-	"private": false,
-	"productName": "cpu-intensive",
-	"publishConfig": {
-		"access": "public"
+	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/BenchMarkElectron#readme",
+	"bugs": {
+		"url": "HTTPS://GitHub.Com/CodeEditorLand/BenchMarkElectron/issues"
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+HTTPS://github.com/CodeEditorLand/BenchMarkElectron.git"
 	},
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "🌆 — Land —",
+		"email": "Land@PlayForm.Cloud",
+		"url": "HTTPS://Land.PlayForm.Cloud"
+	},
+	"type": "module",
+	"main": "src/index.js",
 	"scripts": {
 		"Document": "Document 'Source/**/*.ts'",
 		"make": "electron-forge make",
@@ -41,6 +29,18 @@
 		"publish": "electron-forge publish",
 		"start": "electron-forge start"
 	},
-	"type": "module",
-	"version": "0.0.1"
+	"config": {
+		"forge": {
+			"packagerConfig": {}
+		}
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"@playform/build": "0.0.7",
+		"@playform/document": "0.0.6"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"productName": "cpu-intensive"
 }
