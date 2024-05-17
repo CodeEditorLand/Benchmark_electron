@@ -1,26 +1,6 @@
 {
 	"name": "cpu-intensive",
-	"version": "0.0.1",
-	"private": false,
 	"description": "My Electron application description",
-	"keywords": [
-		"land"
-	],
-	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/BenchMarkElectron#readme",
-	"bugs": {
-		"url": "HTTPS://GitHub.Com/CodeEditorLand/BenchMarkElectron/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+HTTPS://github.com/CodeEditorLand/BenchMarkElectron.git"
-	},
-	"license": "SEE LICENSE IN LICENSE",
-	"author": {
-		"name": "🛬 Land —",
-		"email": "Land@PlayForm.Cloud",
-		"url": "HTTPS://Land.PlayForm.Cloud"
-	},
-	"type": "module",
 	"main": "src/index.js",
 	"scripts": {
 		"Document": "Document 'Source/**/*.ts'",
@@ -36,11 +16,7 @@
 	},
 	"dependencies": {},
 	"devDependencies": {
-		"@playform/build": "0.0.7",
-		"@playform/document": "0.0.6"
-	},
-	"publishConfig": {
-		"access": "public"
+		"@playform/build": "0.0.7"
 	},
 	"productName": "cpu-intensive"
 }
