@@ -6,9 +6,9 @@
 // Create web worker
 const THRESHOLD = 10000000;
 const worker = new Worker("./worker.js");
-
+/** @type {HTMLButtonElement} */
 const start = document.getElementById("start");
-
+/** @type {HTMLParagraphElement} */
 const status = document.getElementById("status");
 const results = document.getElementById("results");
 
