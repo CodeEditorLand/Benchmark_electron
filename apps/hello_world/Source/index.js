@@ -4,22 +4,22 @@ const path = require("path");
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
-  // eslint-disable-line global-require
-  app.quit();
+	// eslint-disable-line global-require
+	app.quit();
 }
 
 const createWindow = () => {
-  const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-  });
-  mainWindow.webContents.on("dom-ready", () => {
-    // without interval it panic?
-    setInterval(() => {
-      app.quit();
-    }, 1);
-  });
-  mainWindow.loadFile(path.join(__dirname, "index.html"));
+	const mainWindow = new BrowserWindow({
+		width: 800,
+		height: 600,
+	});
+	mainWindow.webContents.on("dom-ready", () => {
+		// without interval it panic?
+		setInterval(() => {
+			app.quit();
+		}, 1);
+	});
+	mainWindow.loadFile(path.join(__dirname, "index.html"));
 };
 
 // This method will be called when Electron has finished
@@ -31,19 +31,19 @@ app.on("ready", createWindow);
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
+	if (process.platform !== "darwin") {
+		app.quit();
+	}
 });
 
 ipcMain.on("dom-ready", (event, arg) => {
-  app.quit();
+	app.quit();
 });
 
 app.on("activate", () => {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
+	// On OS X it's common to re-create a window in the app when the
+	// dock icon is clicked and there are no other windows open.
+	if (BrowserWindow.getAllWindows().length === 0) {
+		createWindow();
+	}
 });
