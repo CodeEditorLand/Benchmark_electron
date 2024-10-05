@@ -2,24 +2,26 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-License-Identifier: MIT
 
+use std::{
+	collections::HashMap,
+	env,
+	fs,
+	process::{Command, Stdio},
+};
+
 use anyhow::Result;
 use serde::Serialize;
 use serde_json::Value;
-use std::{
-	collections::HashMap,
-	env, fs,
-	process::{Command, Stdio},
-};
 use utils::root_path;
 
 mod utils;
 
-fn read_json(filename: &str) -> Result<Value> {
+fn read_json(filename:&str) -> Result<Value> {
 	let f = fs::File::open(filename)?;
 	Ok(serde_json::from_reader(f)?)
 }
 
-fn write_json(filename: &str, value: &Value) -> Result<()> {
+fn write_json(filename:&str, value:&Value) -> Result<()> {
 	let f = fs::File::create(filename)?;
 	serde_json::to_writer(f, value)?;
 	Ok(())
@@ -27,7 +29,7 @@ fn write_json(filename: &str, value: &Value) -> Result<()> {
 
 /// The list of the examples of the benchmark name, arguments and return code
 #[cfg(target_os = "linux")]
-const EXEC_TIME_BENCHMARKS: &[(&str, &str, Option<i32>)] = &[
+const EXEC_TIME_BENCHMARKS:&[(&str, &str, Option<i32>)] = &[
 	(
 		"electron_hello_world",
 		"apps/hello_world/out/startup-electron-linux-x64/startup-electron",
@@ -38,48 +40,58 @@ const EXEC_TIME_BENCHMARKS: &[(&str, &str, Option<i32>)] = &[
 		"apps/cpu_intensive/out/cpu-intensive-linux-x64/cpu-intensive",
 		None,
 	),
-	("electron_3mb_transfer", "apps/file_transfer/out/file-transfer-linux-x64/file-transfer", None),
+	(
+		"electron_3mb_transfer",
+		"apps/file_transfer/out/file-transfer-linux-x64/file-transfer",
+		None,
+	),
 ];
 
 #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
-const EXEC_TIME_BENCHMARKS: &[(&str, &str, Option<i32>)] = &[
-  (
-    "electron_hello_world",
-    "apps/hello_world/out/startup-electron-darwin-x64/startup-electron.app/Contents/MacOS/startup-electron",
-    None,
-  ),
-  (
-    "electron_cpu_intensive",
-    "apps/cpu_intensive/out/cpu-intensive-darwin-x64/cpu-intensive.app/Contents/MacOS/cpu-intensive",
-    None,
-  ),
-  (
-    "electron_3mb_transfer",
-    "apps/file_transfer/out/file-transfer-darwin-x64/file-transfer.app/Contents/MacOS/file-transfer",
-    None,
-  ),
+const EXEC_TIME_BENCHMARKS:&[(&str, &str, Option<i32>)] = &[
+	(
+		"electron_hello_world",
+		"apps/hello_world/out/startup-electron-darwin-x64/startup-electron.\
+		 app/Contents/MacOS/startup-electron",
+		None,
+	),
+	(
+		"electron_cpu_intensive",
+		"apps/cpu_intensive/out/cpu-intensive-darwin-x64/cpu-intensive.app/\
+		 Contents/MacOS/cpu-intensive",
+		None,
+	),
+	(
+		"electron_3mb_transfer",
+		"apps/file_transfer/out/file-transfer-darwin-x64/file-transfer.app/\
+		 Contents/MacOS/file-transfer",
+		None,
+	),
 ];
 
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-const EXEC_TIME_BENCHMARKS: &[(&str, &str, Option<i32>)] = &[
-  (
-    "electron_hello_world",
-    "apps/hello_world/out/startup-electron-darwin-arm64/startup-electron.app/Contents/MacOS/startup-electron",
-    None,
-  ),
-  (
-    "electron_cpu_intensive",
-    "apps/cpu_intensive/out/cpu-intensive-darwin-arm64/cpu-intensive.app/Contents/MacOS/cpu-intensive",
-    None,
-  ),
-  (
-    "electron_3mb_transfer",
-    "apps/file_transfer/out/file-transfer-darwin-arm64/file-transfer.app/Contents/MacOS/file-transfer",
-    None,
-  ),
+const EXEC_TIME_BENCHMARKS:&[(&str, &str, Option<i32>)] = &[
+	(
+		"electron_hello_world",
+		"apps/hello_world/out/startup-electron-darwin-arm64/startup-electron.\
+		 app/Contents/MacOS/startup-electron",
+		None,
+	),
+	(
+		"electron_cpu_intensive",
+		"apps/cpu_intensive/out/cpu-intensive-darwin-arm64/cpu-intensive.app/\
+		 Contents/MacOS/cpu-intensive",
+		None,
+	),
+	(
+		"electron_3mb_transfer",
+		"apps/file_transfer/out/file-transfer-darwin-arm64/file-transfer.app/\
+		 Contents/MacOS/file-transfer",
+		None,
+	),
 ];
 
-fn run_strace_benchmarks(new_data: &mut BenchResult) -> Result<()> {
+fn run_strace_benchmarks(new_data:&mut BenchResult) -> Result<()> {
 	use std::io::Read;
 
 	let mut thread_count = HashMap::<String, u64>::new();
@@ -122,7 +134,8 @@ fn run_max_mem_benchmark() -> Result<HashMap<String, u64>> {
 	let mut results = HashMap::<String, u64>::new();
 
 	for (name, example_exe, _) in EXEC_TIME_BENCHMARKS {
-		let benchmark_file = utils::root_path().join(format!("mprof{}_.dat", name));
+		let benchmark_file =
+			utils::root_path().join(format!("mprof{}_.dat", name));
 		let benchmark_file = benchmark_file.to_str().unwrap();
 
 		let proc = Command::new("mprof")
@@ -139,7 +152,10 @@ fn run_max_mem_benchmark() -> Result<HashMap<String, u64>> {
 
 		let proc_result = proc.wait_with_output()?;
 		println!("{:?}", proc_result);
-		results.insert(name.to_string(), utils::parse_max_mem(&benchmark_file).unwrap());
+		results.insert(
+			name.to_string(),
+			utils::parse_max_mem(&benchmark_file).unwrap(),
+		);
 	}
 
 	Ok(results)
@@ -156,29 +172,37 @@ fn get_binary_sizes() -> Result<HashMap<String, u64>> {
 	Ok(sizes)
 }
 
-const RESULT_KEYS: &[&str] = &["mean", "stddev", "user", "system", "min", "max"];
+const RESULT_KEYS:&[&str] = &["mean", "stddev", "user", "system", "min", "max"];
 
 fn run_exec_time() -> Result<HashMap<String, HashMap<String, f64>>> {
 	let benchmark_file = root_path().join("hyperfine_results.json");
 	let benchmark_file = benchmark_file.to_str().unwrap();
 
-	let mut command = ["hyperfine", "--export-json", benchmark_file, "--warmup", "3"]
-		.iter()
-		.map(|s| s.to_string())
-		.collect::<Vec<_>>();
+	let mut command =
+		["hyperfine", "--export-json", benchmark_file, "--warmup", "3"]
+			.iter()
+			.map(|s| s.to_string())
+			.collect::<Vec<_>>();
 
 	for (_, example_exe, _return_code) in EXEC_TIME_BENCHMARKS {
-		command.push(utils::root_path().join(example_exe).to_str().unwrap().to_string());
+		command.push(
+			utils::root_path().join(example_exe).to_str().unwrap().to_string(),
+		);
 	}
 
 	utils::run(&command.iter().map(|s| s.as_ref()).collect::<Vec<_>>());
 
 	let mut results = HashMap::<String, HashMap<String, f64>>::new();
 	let hyperfine_results = read_json(benchmark_file)?;
-	for ((name, _, _), data) in EXEC_TIME_BENCHMARKS
-		.iter()
-		.zip(hyperfine_results.as_object().unwrap().get("results").unwrap().as_array().unwrap())
-	{
+	for ((name, ..), data) in EXEC_TIME_BENCHMARKS.iter().zip(
+		hyperfine_results
+			.as_object()
+			.unwrap()
+			.get("results")
+			.unwrap()
+			.as_array()
+			.unwrap(),
+	) {
 		let data = data.as_object().unwrap().clone();
 		results.insert(
 			name.to_string(),
@@ -194,13 +218,13 @@ fn run_exec_time() -> Result<HashMap<String, HashMap<String, f64>>> {
 
 #[derive(Default, Serialize, Debug)]
 struct BenchResult {
-	created_at: String,
-	sha1: String,
-	exec_time: HashMap<String, HashMap<String, f64>>,
-	binary_size: HashMap<String, u64>,
-	max_memory: HashMap<String, u64>,
-	thread_count: HashMap<String, u64>,
-	syscall_count: HashMap<String, u64>,
+	created_at:String,
+	sha1:String,
+	exec_time:HashMap<String, HashMap<String, f64>>,
+	binary_size:HashMap<String, u64>,
+	max_memory:HashMap<String, u64>,
+	thread_count:HashMap<String, u64>,
+	syscall_count:HashMap<String, u64>,
 }
 
 fn main() -> Result<()> {
@@ -215,10 +239,14 @@ fn main() -> Result<()> {
 	println!("{:?}", &utils::root_path());
 
 	let mut new_data = BenchResult {
-		created_at: chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true),
-		sha1: utils::run_collect(&["git", "rev-parse", "HEAD"]).0.trim().to_string(),
-		exec_time: run_exec_time()?,
-		binary_size: get_binary_sizes()?,
+		created_at:chrono::Utc::now()
+			.to_rfc3339_opts(chrono::SecondsFormat::Secs, true),
+		sha1:utils::run_collect(&["git", "rev-parse", "HEAD"])
+			.0
+			.trim()
+			.to_string(),
+		exec_time:run_exec_time()?,
+		binary_size:get_binary_sizes()?,
 		..Default::default()
 	};
 
