@@ -51,20 +51,20 @@ const EXEC_TIME_BENCHMARKS:&[(&str, &str, Option<i32>)] = &[
 const EXEC_TIME_BENCHMARKS:&[(&str, &str, Option<i32>)] = &[
 	(
 		"electron_hello_world",
-		"apps/hello_world/out/startup-electron-darwin-x64/startup-electron.\
-		 app/Contents/MacOS/startup-electron",
+		"apps/hello_world/out/startup-electron-darwin-x64/startup-electron.app/Contents/MacOS/\
+		 startup-electron",
 		None,
 	),
 	(
 		"electron_cpu_intensive",
-		"apps/cpu_intensive/out/cpu-intensive-darwin-x64/cpu-intensive.app/\
-		 Contents/MacOS/cpu-intensive",
+		"apps/cpu_intensive/out/cpu-intensive-darwin-x64/cpu-intensive.app/Contents/MacOS/\
+		 cpu-intensive",
 		None,
 	),
 	(
 		"electron_3mb_transfer",
-		"apps/file_transfer/out/file-transfer-darwin-x64/file-transfer.app/\
-		 Contents/MacOS/file-transfer",
+		"apps/file_transfer/out/file-transfer-darwin-x64/file-transfer.app/Contents/MacOS/\
+		 file-transfer",
 		None,
 	),
 ];
@@ -73,20 +73,20 @@ const EXEC_TIME_BENCHMARKS:&[(&str, &str, Option<i32>)] = &[
 const EXEC_TIME_BENCHMARKS:&[(&str, &str, Option<i32>)] = &[
 	(
 		"electron_hello_world",
-		"apps/hello_world/out/startup-electron-darwin-arm64/startup-electron.\
-		 app/Contents/MacOS/startup-electron",
+		"apps/hello_world/out/startup-electron-darwin-arm64/startup-electron.app/Contents/MacOS/\
+		 startup-electron",
 		None,
 	),
 	(
 		"electron_cpu_intensive",
-		"apps/cpu_intensive/out/cpu-intensive-darwin-arm64/cpu-intensive.app/\
-		 Contents/MacOS/cpu-intensive",
+		"apps/cpu_intensive/out/cpu-intensive-darwin-arm64/cpu-intensive.app/Contents/MacOS/\
+		 cpu-intensive",
 		None,
 	),
 	(
 		"electron_3mb_transfer",
-		"apps/file_transfer/out/file-transfer-darwin-arm64/file-transfer.app/\
-		 Contents/MacOS/file-transfer",
+		"apps/file_transfer/out/file-transfer-darwin-arm64/file-transfer.app/Contents/MacOS/\
+		 file-transfer",
 		None,
 	),
 ];
@@ -134,8 +134,7 @@ fn run_max_mem_benchmark() -> Result<HashMap<String, u64>> {
 	let mut results = HashMap::<String, u64>::new();
 
 	for (name, example_exe, _) in EXEC_TIME_BENCHMARKS {
-		let benchmark_file =
-			utils::root_path().join(format!("mprof{}_.dat", name));
+		let benchmark_file = utils::root_path().join(format!("mprof{}_.dat", name));
 		let benchmark_file = benchmark_file.to_str().unwrap();
 
 		let proc = Command::new("mprof")
@@ -152,10 +151,7 @@ fn run_max_mem_benchmark() -> Result<HashMap<String, u64>> {
 
 		let proc_result = proc.wait_with_output()?;
 		println!("{:?}", proc_result);
-		results.insert(
-			name.to_string(),
-			utils::parse_max_mem(&benchmark_file).unwrap(),
-		);
+		results.insert(name.to_string(), utils::parse_max_mem(&benchmark_file).unwrap());
 	}
 
 	Ok(results)
@@ -178,16 +174,13 @@ fn run_exec_time() -> Result<HashMap<String, HashMap<String, f64>>> {
 	let benchmark_file = root_path().join("hyperfine_results.json");
 	let benchmark_file = benchmark_file.to_str().unwrap();
 
-	let mut command =
-		["hyperfine", "--export-json", benchmark_file, "--warmup", "3"]
-			.iter()
-			.map(|s| s.to_string())
-			.collect::<Vec<_>>();
+	let mut command = ["hyperfine", "--export-json", benchmark_file, "--warmup", "3"]
+		.iter()
+		.map(|s| s.to_string())
+		.collect::<Vec<_>>();
 
 	for (_, example_exe, _return_code) in EXEC_TIME_BENCHMARKS {
-		command.push(
-			utils::root_path().join(example_exe).to_str().unwrap().to_string(),
-		);
+		command.push(utils::root_path().join(example_exe).to_str().unwrap().to_string());
 	}
 
 	utils::run(&command.iter().map(|s| s.as_ref()).collect::<Vec<_>>());
@@ -239,12 +232,8 @@ fn main() -> Result<()> {
 	println!("{:?}", &utils::root_path());
 
 	let mut new_data = BenchResult {
-		created_at:chrono::Utc::now()
-			.to_rfc3339_opts(chrono::SecondsFormat::Secs, true),
-		sha1:utils::run_collect(&["git", "rev-parse", "HEAD"])
-			.0
-			.trim()
-			.to_string(),
+		created_at:chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true),
+		sha1:utils::run_collect(&["git", "rev-parse", "HEAD"]).0.trim().to_string(),
 		exec_time:run_exec_time()?,
 		binary_size:get_binary_sizes()?,
 		..Default::default()

@@ -44,8 +44,7 @@ pub fn parse_max_mem(file_path:&str) -> Option<u64> {
 			let split = line.split(" ").collect::<Vec<_>>();
 			if split.len() == 3 {
 				// mprof generate result in MB
-				let current_bytes =
-					str::parse::<f64>(split[1]).unwrap() as u64 * 1024 * 1024;
+				let current_bytes = str::parse::<f64>(split[1]).unwrap() as u64 * 1024 * 1024;
 				if current_bytes > highest {
 					highest = current_bytes;
 				}
@@ -74,9 +73,8 @@ pub struct StraceOutput {
 pub fn parse_strace_output(output:&str) -> HashMap<String, StraceOutput> {
 	let mut summary = HashMap::new();
 
-	let mut lines = output
-		.lines()
-		.filter(|line| !line.is_empty() && !line.contains("detached ..."));
+	let mut lines =
+		output.lines().filter(|line| !line.is_empty() && !line.contains("detached ..."));
 	let count = lines.clone().count();
 
 	if count < 4 {
@@ -98,9 +96,7 @@ pub fn parse_strace_output(output:&str) -> HashMap<String, StraceOutput> {
 				StraceOutput {
 					percent_time:str::parse::<f64>(syscall_fields[0]).unwrap(),
 					seconds:str::parse::<f64>(syscall_fields[1]).unwrap(),
-					usecs_per_call:Some(
-						str::parse::<u64>(syscall_fields[2]).unwrap(),
-					),
+					usecs_per_call:Some(str::parse::<u64>(syscall_fields[2]).unwrap()),
 					calls:str::parse::<u64>(syscall_fields[3]).unwrap(),
 					errors:if syscall_fields.len() < 6 {
 						0
@@ -134,9 +130,7 @@ pub fn parse_strace_output(output:&str) -> HashMap<String, StraceOutput> {
 				StraceOutput {
 					percent_time:str::parse::<f64>(total_fields[0]).unwrap(),
 					seconds:str::parse::<f64>(total_fields[1]).unwrap(),
-					usecs_per_call:Some(
-						str::parse::<u64>(total_fields[2]).unwrap(),
-					),
+					usecs_per_call:Some(str::parse::<u64>(total_fields[2]).unwrap()),
 					calls:str::parse::<u64>(total_fields[3]).unwrap(),
 					errors:str::parse::<u64>(total_fields[4]).unwrap(),
 				},

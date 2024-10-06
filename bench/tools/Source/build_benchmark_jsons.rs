@@ -35,24 +35,20 @@ struct BenchResult {
 
 fn main() {
 	let electron_data = root_dir().join("gh-pages").join("electron-data.json");
-	let electron_recent =
-		root_dir().join("gh-pages").join("electron-recent.json");
+	let electron_recent = root_dir().join("gh-pages").join("electron-recent.json");
 
 	// current data
 	let current_data_buffer = BufReader::new(
-		File::open(root_dir().join("bench.json"))
-			.expect("Unable to read current data file"),
+		File::open(root_dir().join("bench.json")).expect("Unable to read current data file"),
 	);
-	let current_data:BenchResult = serde_json::from_reader(current_data_buffer)
-		.expect("Unable to read current data buffer");
+	let current_data:BenchResult =
+		serde_json::from_reader(current_data_buffer).expect("Unable to read current data buffer");
 
 	// all data's
-	let all_data_buffer = BufReader::new(
-		File::open(&electron_data).expect("Unable to read all data file"),
-	);
+	let all_data_buffer =
+		BufReader::new(File::open(&electron_data).expect("Unable to read all data file"));
 	let mut all_data:Vec<BenchResult> =
-		serde_json::from_reader(all_data_buffer)
-			.expect("Unable to read all data buffer");
+		serde_json::from_reader(all_data_buffer).expect("Unable to read all data buffer");
 
 	// add current data to alls data
 	all_data.push(current_data);
@@ -67,12 +63,10 @@ fn main() {
 
 	write_json(
 		&electron_data,
-		&serde_json::to_value(&all_data)
-			.expect("Unable to build final json (alls)"),
+		&serde_json::to_value(&all_data).expect("Unable to build final json (alls)"),
 	);
 	write_json(
 		&electron_recent,
-		&serde_json::to_value(&recent)
-			.expect("Unable to build final json (recent)"),
+		&serde_json::to_value(&recent).expect("Unable to build final json (recent)"),
 	);
 }
