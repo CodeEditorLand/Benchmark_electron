@@ -15,19 +15,27 @@ pub fn root_path() -> PathBuf { PathBuf::from(env!("CARGO_MANIFEST_DIR")) }
 
 pub fn run_collect(cmd:&[&str]) -> (String, String) {
 	let mut process_builder = Command::new(cmd[0]);
+
 	process_builder
 		.args(&cmd[1..])
 		.stdin(Stdio::piped())
 		.stdout(Stdio::piped())
 		.stderr(Stdio::piped());
+
 	let prog = process_builder.spawn().expect("failed to spawn script");
+
 	let Output { stdout, stderr, status } =
 		prog.wait_with_output().expect("failed to wait on child");
+
 	let stdout = String::from_utf8(stdout).unwrap();
+
 	let stderr = String::from_utf8(stderr).unwrap();
+
 	if !status.success() {
 		eprintln!("stdout: <<<{}>>>", stdout);
+
 		eprintln!("stderr: <<<{}>>>", stderr);
+
 		panic!("Unexpected exit code: {:?}", status.code());
 	}
 	(stdout, stderr)
@@ -35,16 +43,20 @@ pub fn run_collect(cmd:&[&str]) -> (String, String) {
 
 pub fn parse_max_mem(file_path:&str) -> Option<u64> {
 	let file = std::fs::File::open(file_path).unwrap();
+
 	let output = std::io::BufReader::new(file);
+
 	let mut highest:u64 = 0;
 	// MEM 203.437500 1621617192.4123
 	for line in output.lines() {
 		if let Ok(line) = line {
 			// split line by space
 			let split = line.split(" ").collect::<Vec<_>>();
+
 			if split.len() == 3 {
 				// mprof generate result in MB
 				let current_bytes = str::parse::<f64>(split[1]).unwrap() as u64 * 1024 * 1024;
+
 				if current_bytes > highest {
 					highest = current_bytes;
 				}
@@ -75,6 +87,7 @@ pub fn parse_strace_output(output:&str) -> HashMap<String, StraceOutput> {
 
 	let mut lines =
 		output.lines().filter(|line| !line.is_empty() && !line.contains("detached ..."));
+
 	let count = lines.clone().count();
 
 	if count < 4 {
@@ -82,12 +95,15 @@ pub fn parse_strace_output(output:&str) -> HashMap<String, StraceOutput> {
 	}
 
 	let total_line = lines.next_back().unwrap();
+
 	lines.next_back(); // Drop separator
 	let data_lines = lines.skip(2);
 
 	for line in data_lines {
 		let syscall_fields = line.split_whitespace().collect::<Vec<_>>();
+
 		let len = syscall_fields.len();
+
 		let syscall_name = syscall_fields.last().unwrap();
 
 		if (5..=6).contains(&len) {
@@ -144,9 +160,13 @@ pub fn parse_strace_output(output:&str) -> HashMap<String, StraceOutput> {
 
 pub fn run(cmd:&[&str]) {
 	let mut process_builder = Command::new(cmd[0]);
+
 	process_builder.args(&cmd[1..]).stdin(Stdio::piped());
+
 	let mut prog = process_builder.spawn().expect("failed to spawn script");
+
 	let status = prog.wait().expect("failed to wait on child");
+
 	if !status.success() {
 		panic!("Unexpected exit code: {:?}", status.code());
 	}

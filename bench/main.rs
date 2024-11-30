@@ -18,12 +18,15 @@ mod utils;
 
 fn read_json(filename:&str) -> Result<Value> {
 	let f = fs::File::open(filename)?;
+
 	Ok(serde_json::from_reader(f)?)
 }
 
 fn write_json(filename:&str, value:&Value) -> Result<()> {
 	let f = fs::File::create(filename)?;
+
 	serde_json::to_writer(f, value)?;
+
 	Ok(())
 }
 
@@ -95,6 +98,7 @@ fn run_strace_benchmarks(new_data:&mut BenchResult) -> Result<()> {
 	use std::io::Read;
 
 	let mut thread_count = HashMap::<String, u64>::new();
+
 	let mut syscall_count = HashMap::<String, u64>::new();
 
 	for (name, example_exe, _) in EXEC_TIME_BENCHMARKS {
@@ -113,18 +117,24 @@ fn run_strace_benchmarks(new_data:&mut BenchResult) -> Result<()> {
 			.wait()?;
 
 		let mut output = String::new();
+
 		file.as_file_mut().read_to_string(&mut output)?;
 
 		let strace_result = utils::parse_strace_output(&output);
+
 		let clone = 1
 			+ strace_result.get("clone").map(|d| d.calls).unwrap_or(0)
 			+ strace_result.get("clone3").map(|d| d.calls).unwrap_or(0);
+
 		let total = strace_result.get("total").unwrap().calls;
+
 		thread_count.insert(name.to_string(), clone);
+
 		syscall_count.insert(name.to_string(), total);
 	}
 
 	new_data.thread_count = thread_count;
+
 	new_data.syscall_count = syscall_count;
 
 	Ok(())
@@ -135,6 +145,7 @@ fn run_max_mem_benchmark() -> Result<HashMap<String, u64>> {
 
 	for (name, example_exe, _) in EXEC_TIME_BENCHMARKS {
 		let benchmark_file = utils::root_path().join(format!("mprof{}_.dat", name));
+
 		let benchmark_file = benchmark_file.to_str().unwrap();
 
 		let proc = Command::new("mprof")
@@ -150,7 +161,9 @@ fn run_max_mem_benchmark() -> Result<HashMap<String, u64>> {
 			.spawn()?;
 
 		let proc_result = proc.wait_with_output()?;
+
 		println!("{:?}", proc_result);
+
 		results.insert(name.to_string(), utils::parse_max_mem(&benchmark_file).unwrap());
 	}
 
@@ -162,6 +175,7 @@ fn get_binary_sizes() -> Result<HashMap<String, u64>> {
 	// add size for all EXEC_TIME_BENCHMARKS
 	for (name, example_exe, _) in EXEC_TIME_BENCHMARKS {
 		let meta = std::fs::metadata(example_exe).unwrap();
+
 		sizes.insert(name.to_string(), meta.len());
 	}
 
@@ -172,6 +186,7 @@ const RESULT_KEYS:&[&str] = &["mean", "stddev", "user", "system", "min", "max"];
 
 fn run_exec_time() -> Result<HashMap<String, HashMap<String, f64>>> {
 	let benchmark_file = root_path().join("hyperfine_results.json");
+
 	let benchmark_file = benchmark_file.to_str().unwrap();
 
 	let mut command = ["hyperfine", "--export-json", benchmark_file, "--warmup", "3"]
@@ -186,7 +201,9 @@ fn run_exec_time() -> Result<HashMap<String, HashMap<String, f64>>> {
 	utils::run(&command.iter().map(|s| s.as_ref()).collect::<Vec<_>>());
 
 	let mut results = HashMap::<String, HashMap<String, f64>>::new();
+
 	let hyperfine_results = read_json(benchmark_file)?;
+
 	for ((name, ..), data) in EXEC_TIME_BENCHMARKS.iter().zip(
 		hyperfine_results
 			.as_object()
@@ -197,6 +214,7 @@ fn run_exec_time() -> Result<HashMap<String, HashMap<String, f64>>> {
 			.unwrap(),
 	) {
 		let data = data.as_object().unwrap().clone();
+
 		results.insert(
 			name.to_string(),
 			data.into_iter()
@@ -241,11 +259,14 @@ fn main() -> Result<()> {
 
 	if cfg!(target_os = "linux") {
 		run_strace_benchmarks(&mut new_data)?;
+
 		new_data.max_memory = run_max_mem_benchmark()?;
 	}
 
 	println!("===== <BENCHMARK RESULTS>");
+
 	serde_json::to_writer_pretty(std::io::stdout(), &new_data)?;
+
 	println!("\n===== </BENCHMARK RESULTS>");
 
 	if let Some(filename) = root_path().join("bench.json").to_str() {
